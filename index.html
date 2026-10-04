@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marble Slideck</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="shortcut icon" href="image.png" type="image/png" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-bar">
+        <button
+          class="brand-mark"
+          id="new-deck"
+          title="New Slideck"
+          aria-label="New Slideck"
+        >
+          <span></span>
+        </button>
+        <nav class="menu-bar" aria-label="Editor menus">
+          <div class="menu-group">
+            <button
+              class="menu-trigger"
+              data-menu-trigger="file"
+              aria-expanded="false"
+              aria-controls="file-menu"
+            >
+              File
+            </button>
+            <div class="menu-popover" id="file-menu" role="menu" hidden>
+              <button role="menuitem" data-command="new-deck">
+                New Slideck
+              </button>
+              <button role="menuitem" data-command="open">Open…</button>
+              <button role="menuitem" data-command="save">Save Slideck</button>
+              <hr />
+              <button role="menuitem" data-command="new-slide">
+                New slide
+              </button>
+            </div>
+          </div>
+          <div class="menu-group">
+            <button
+              class="menu-trigger"
+              data-menu-trigger="edit"
+              aria-expanded="false"
+              aria-controls="edit-menu"
+            >
+              Edit
+            </button>
+            <div class="menu-popover" id="edit-menu" role="menu" hidden>
+              <button id="menu-undo" role="menuitem" data-command="undo">
+                Undo <kbd>Ctrl+Z</kbd>
+              </button>
+              <button id="menu-redo" role="menuitem" data-command="redo">
+                Redo <kbd>Ctrl+Y</kbd>
+              </button>
+              <hr />
+              <button id="menu-copy" role="menuitem" data-command="copy">
+                Copy <kbd>Ctrl+C</kbd>
+              </button>
+              <button id="menu-paste" role="menuitem" data-command="paste">
+                Paste <kbd>Ctrl+V</kbd>
+              </button>
+              <button
+                id="menu-duplicate"
+                role="menuitem"
+                data-command="duplicate"
+              >
+                Duplicate <kbd>Ctrl+D</kbd>
+              </button>
+              <button id="menu-delete" role="menuitem" data-command="delete">
+                Delete <kbd>Del</kbd>
+              </button>
+            </div>
+          </div>
+          <div class="menu-group">
+            <button
+              class="menu-trigger"
+              data-menu-trigger="view"
+              aria-expanded="false"
+              aria-controls="view-menu"
+            >
+              View
+            </button>
+            <div class="menu-popover" id="view-menu" role="menu" hidden>
+              <button
+                role="menuitemcheckbox"
+                aria-checked="true"
+                data-command="toggle-slides"
+              >
+                Slide navigator
+              </button>
+              <button
+                role="menuitemcheckbox"
+                aria-checked="true"
+                data-command="toggle-properties"
+              >
+                Properties panel
+              </button>
+              <hr />
+              <button role="menuitem" data-command="present">Present</button>
+            </div>
+          </div>
+          <div class="menu-group">
+            <button
+              class="menu-trigger"
+              data-menu-trigger="tools"
+              aria-expanded="false"
+              aria-controls="tools-menu"
+            >
+              Tools
+            </button>
+            <div class="menu-popover" id="tools-menu" role="menu" hidden>
+              <button role="menuitem" data-command="insert-text">
+                Insert text
+              </button>
+              <hr />
+              <button role="menuitem" data-command="insert-rect">
+                Rectangle
+              </button>
+              <button role="menuitem" data-command="insert-round">
+                Rounded rectangle
+              </button>
+              <button role="menuitem" data-command="insert-circle">
+                Circle
+              </button>
+              <button role="menuitem" data-command="insert-line">Line</button>
+              <button role="menuitem" data-command="insert-image">
+                Image from computer…
+              </button>
+            </div>
+          </div>
+        </nav>
+        <div class="deck-heading">
+          <input
+            id="deck-title"
+            aria-label="Presentation title"
+            value="Untitled Slideck"
+          />
+          <div class="save-state">
+            <span id="save-indicator"></span
+            ><span id="save-label">Saved locally</span>
+          </div>
+        </div>
+        <div class="app-actions">
+          <button
+            class="icon-button"
+            id="undo"
+            title="Undo (Ctrl+Z)"
+            aria-label="Undo"
+          >
+            ↶
+          </button>
+          <button
+            class="icon-button"
+            id="redo"
+            title="Redo (Ctrl+Y)"
+            aria-label="Redo"
+          >
+            ↷
+          </button>
+          <span class="bar-divider"></span>
+          <button
+            class="text-button"
+            id="open-file"
+            title="Open a .slideck file"
+          >
+            Open
+          </button>
+          <button
+            class="text-button"
+            id="save-file"
+            title="Download a .slideck file"
+          >
+            Save
+          </button>
+          <button class="present-button" id="present">
+            Present <span>▶</span>
+          </button>
+          <input
+            id="file-input"
+            type="file"
+            accept=".slideck,application/json"
+            hidden
+          />
+        </div>
+      </header>
+
+      <div class="editor-body">
+        <aside class="slide-sidebar">
+          <div class="sidebar-heading">
+            <span>Slides</span><span id="slide-count">01</span>
+          </div>
+          <div id="slides" class="slide-list" aria-label="Slides"></div>
+          <button id="new-slide" class="new-slide-button">
+            <span>+</span> New slide
+          </button>
+          <div class="sidebar-foot">MARBLE <span>SLIDECK</span></div>
+        </aside>
+
+        <main class="workspace">
+          <div class="toolbar">
+            <div class="tool-group">
+              <button id="insert-text" class="tool-button">
+                <span class="tool-glyph text-glyph">T</span><span>Text</span>
+              </button>
+              <span class="toolbar-divider"></span>
+              <button id="insert-rect" class="tool-button">
+                <span class="shape-glyph rect-glyph"></span
+                ><span>Rectangle</span>
+              </button>
+              <button id="insert-round" class="tool-button">
+                <span class="shape-glyph round-glyph"></span
+                ><span>Rounded</span>
+              </button>
+              <button id="insert-circle" class="tool-button">
+                <span class="shape-glyph circle-glyph"></span
+                ><span>Circle</span>
+              </button>
+              <button id="insert-line" class="tool-button">
+                <span class="shape-glyph line-glyph"></span><span>Line</span>
+              </button>
+              <span class="toolbar-divider"></span>
+              <button id="insert-image" class="tool-button">
+                <span class="image-glyph">▧</span><span>Image</span>
+              </button>
+              <input id="image-input" type="file" accept="image/*" hidden />
+            </div>
+            <div class="tool-group object-actions" id="object-actions" hidden>
+              <span class="toolbar-divider"></span>
+              <button
+                id="duplicate-object"
+                class="icon-button small"
+                title="Duplicate (Ctrl+D)"
+                aria-label="Duplicate"
+              >
+                ▢
+              </button>
+              <button
+                id="layer-up"
+                class="icon-button small"
+                title="Bring forward"
+                aria-label="Bring forward"
+              >
+                ↑
+              </button>
+              <button
+                id="layer-down"
+                class="icon-button small"
+                title="Send backward"
+                aria-label="Send backward"
+              >
+                ↓
+              </button>
+              <button
+                id="delete-object"
+                class="icon-button small danger"
+                title="Delete selected object"
+                aria-label="Delete"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          <div class="format-toolbar" id="text-toolbar" hidden>
+            <label class="format-select" title="Font family"
+              ><span>Font</span
+              ><select id="font-family">
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Courier New">Courier New</option>
+              </select></label
+            >
+            <label class="format-select size-select" title="Font size"
+              ><span>Size</span
+              ><input id="font-size" type="number" min="8" max="160" value="32"
+            /></label>
+            <span class="toolbar-divider"></span>
+            <button id="text-bold" class="format-button" title="Bold">
+              <strong>B</strong>
+            </button>
+            <button id="text-italic" class="format-button" title="Italic">
+              <em>I</em>
+            </button>
+            <button id="text-underline" class="format-button" title="Underline">
+              <u>U</u>
+            </button>
+            <span class="toolbar-divider"></span>
+            <label class="color-control" title="Text color"
+              ><span>A</span
+              ><input id="text-color" type="color" value="#252b2c"
+            /></label>
+            <div class="align-control" aria-label="Text alignment">
+              <button
+                data-align="left"
+                class="format-button active"
+                title="Align left"
+              >
+                ≡
+              </button>
+              <button
+                data-align="center"
+                class="format-button"
+                title="Align center"
+              >
+                ☰
+              </button>
+              <button
+                data-align="right"
+                class="format-button"
+                title="Align right"
+              >
+                ≡
+              </button>
+            </div>
+          </div>
+          <div class="canvas-workspace">
+            <div class="canvas-topline">
+              <span id="canvas-label">Slide 1</span
+              ><button id="slide-background" class="background-control">
+                <span></span> Background
+                <input
+                  id="background-color"
+                  type="color"
+                  value="#ffffff"
+                  aria-label="Slide background color"
+                />
+              </button>
+            </div>
+            <div id="canvas-area" class="canvas-area">
+              <div
+                id="slide"
+                class="slide-canvas"
+                aria-label="Slide canvas"
+              ></div>
+            </div>
+            <div class="canvas-status">
+              <span>16:9</span><span id="selection-status">No selection</span
+              ><span id="zoom-label">Fit</span>
+            </div>
+          </div>
+        </main>
+
+        <aside class="properties-panel" id="properties-panel">
+          <div class="properties-heading">Properties</div>
+          <div id="properties-content" class="properties-content">
+            <div class="empty-inspector">
+              Select an object<br />to edit its properties
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <div id="editor-context-menu" class="context-menu" role="menu" hidden></div>
+    <div id="present-overlay" class="present-overlay" hidden>
+      <header class="present-topbar">
+        <div class="present-identity">
+          <span class="present-mark"></span
+          ><span id="present-title">Untitled Slideck</span
+          ><span class="present-divider"></span
+          ><span class="present-live"><i></i> Presenting</span>
+        </div>
+        <button
+          id="exit-present"
+          class="exit-present"
+          aria-label="Exit presentation"
+          title="Exit presentation (Esc)"
+        >
+          <span>×</span><span>Exit</span><kbd>Esc</kbd>
+        </button>
+      </header>
+      <main class="present-stage">
+        <div id="present-slide" class="present-slide"></div>
+      </main>
+      <footer class="present-footer">
+        <div class="present-controls">
+          <button
+            id="present-prev"
+            aria-label="Previous slide"
+            title="Previous slide"
+          >
+            ←
+          </button>
+          <div class="present-progress">
+            <span id="present-counter">1 / 1</span>
+            <div class="progress-track"><span id="progress-fill"></span></div>
+          </div>
+          <button id="present-next" aria-label="Next slide" title="Next slide">
+            →
+          </button>
+        </div>
+      </footer>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
